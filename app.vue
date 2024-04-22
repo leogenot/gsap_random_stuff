@@ -1,6 +1,6 @@
 <template>
-  <circle-gallery />
-  <!-- <stacked-slider /> -->
+  <!-- <circle-gallery /> -->
+  <stacked-slider />
   <!-- <scroll-trigger-gallery /> -->
   <!-- <infinite-scroll-gallery /> -->
   <!-- <gallery /> -->

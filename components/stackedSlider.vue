@@ -2,7 +2,7 @@
 import { gsap, CustomEase } from 'gsap/all'
 gsap.registerPlugin(CustomEase)
 CustomEase.create('cubic', '0.83, 0, 0.17, 1')
-let isAnimating = false
+const isAnimating = ref(false)
 
 function splitTextIntoSpans(selector) {
   let elements = document.querySelectorAll(selector)
@@ -21,7 +21,7 @@ function splitTextIntoSpans(selector) {
 function initializeCards() {
   let cards = Array.from(document.querySelectorAll('.card'))
   gsap.to(cards, {
-    y: i => -15 + 15 * i + '%',
+    y: i => -20 + 20 * i + '%',
     z: i => 15 * i,
     opacity: 1,
     duration: 1,
@@ -36,8 +36,8 @@ onMounted(() => {
   gsap.set('h1 span', { y: -200 })
   gsap.set('.slider .card:last-child h1 span', { y: 0 })
   document.addEventListener('click', function () {
-    if (isAnimating) return
-    isAnimating = true
+    if (isAnimating.value) return
+    isAnimating.value = true
 
     let slider = document.querySelector('.slider')
     let cards = Array.from(slider.querySelectorAll('.card'))
@@ -51,7 +51,7 @@ onMounted(() => {
     })
 
     gsap.to(lastCard, {
-      y: '+=150%',
+      y: '+=250%',
       duration: 0.75,
       ease: 'cubic',
       onComplete: () => {
@@ -60,7 +60,7 @@ onMounted(() => {
         gsap.set(lastCard.querySelectorAll('h1 span'), { y: -200 })
 
         setTimeout(() => {
-          isAnimating = false
+          isAnimating.value = false
         }, 1000)
       },
     })
@@ -100,61 +100,10 @@ onMounted(() => {
   box-sizing: border-box;
 }
 
-body {
-  font-family: 'PP Neue Montreal';
-}
-
 img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-p,
-a {
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 14px;
-  color: #000;
-}
-
-nav {
-  position: absolute;
-  top: 0;
-  width: 100%;
-  padding: 2em;
-  display: flex;
-  align-items: center;
-  z-index: 2;
-}
-
-nav > div {
-  flex: 1;
-}
-
-.pages {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5em;
-}
-
-.shop {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 2em;
-}
-
-footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  padding: 2em;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 2;
 }
 
 .container {
@@ -206,7 +155,7 @@ footer {
 h1 {
   position: relative;
   text-align: center;
-  font-family: 'PP Editorial Old';
+  font-family: Helvetica;
   font-size: 6vw;
   font-weight: 300;
   letter-spacing: -0.05em;
@@ -217,11 +166,5 @@ h1 {
 h1 span {
   position: relative;
   display: inline-block;
-}
-
-@media (max-width: 900px) {
-  .pages {
-    display: none;
-  }
 }
 </style>
