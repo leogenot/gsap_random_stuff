@@ -40,6 +40,10 @@ const options = [
     value: '3d-sphere',
   },
   {
+    name: 'spline',
+    value: 'spline',
+  },
+  {
     name: 'slider',
     value: 'slider',
   },
