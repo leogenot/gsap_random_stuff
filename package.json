@@ -22,6 +22,7 @@
     "postcss-custom-media": "^8",
     "postcss-functions": "^4.0.2",
     "postcss-nested": "^6.0.1",
+    "simplex-noise": "^4.0.1",
     "three": "^0.164.1",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"

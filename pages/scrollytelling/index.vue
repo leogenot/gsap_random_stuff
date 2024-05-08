@@ -81,6 +81,8 @@ function init() {
   window.addEventListener('resize', onWindowResize)
 }
 
+// Inside animate() function
+// Inside animate() function
 function animate() {
   requestAnimationFrame(animate)
   render()
