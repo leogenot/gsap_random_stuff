@@ -36,6 +36,10 @@ const options = [
     value: 'scrollytelling',
   },
   {
+    name: '3d-sphere',
+    value: '3d-sphere',
+  },
+  {
     name: 'slider',
     value: 'slider',
   },

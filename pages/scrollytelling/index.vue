@@ -1,7 +1,15 @@
 <template>
   <div class="scrollytelling">
-    <NuxtIcon ref="logo" class="logo" name="logo" />
-    <div ref="container" style="width: 100%; height: 100vh"></div>
+    <div class="section"><NuxtIcon ref="logo" class="logo" name="logo" /></div>
+    <div class="section"><NuxtIcon ref="logo" class="logo" name="logo" /></div>
+    <div class="section"><NuxtIcon ref="logo" class="logo" name="logo" /></div>
+    <div class="section"><NuxtIcon ref="logo" class="logo" name="logo" /></div>
+
+    <div
+      ref="container"
+      class="container"
+      style="width: 100%; height: 100vh"
+    ></div>
   </div>
 </template>
 
@@ -9,11 +17,20 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-
-let scene, camera, renderer, particles, particleMaterial, controls
-
+import Stats from 'three/examples/jsm/libs/stats.module'
+let scene,
+  camera,
+  renderer,
+  particles,
+  particleMaterial,
+  controls,
+  composer,
+  renderPass
+const scrollPercent = ref(0)
 const container = ref(null)
 const scrollY = ref(window?.scrollY)
+const animationScripts = ref([])
+const stats = ref(null)
 
 onMounted(() => {
   init()
@@ -27,6 +44,15 @@ onUnmounted(() => {
   dispose()
 })
 
+function lerp(x, y, a) {
+  return (1 - a) * x + a * y
+}
+
+// Used to fit the lerps to start and end at specific scrolling percentages
+function scalePercent(start, end) {
+  return (scrollPercent.value - start) / (end - start)
+}
+
 function init() {
   // Scene setup
   scene = new THREE.Scene()
@@ -38,64 +64,120 @@ function init() {
     0.1,
     1000
   )
-  camera.position.z = 300
+  //   camera.position.z = 300
 
   // Renderer setup
   renderer = new THREE.WebGLRenderer()
+
   renderer.setSize(window.innerWidth, window.innerHeight)
   container.value.appendChild(renderer.domElement)
 
-  // Particle setup - create a sphere of particles
-  const particleCount = 5000
-  const radius = 150 // Adjust the radius of the sphere
-  const particlesGeometry = new THREE.BufferGeometry()
-  const positions = new Float32Array(particleCount * 3)
+  const geometry = new THREE.BoxGeometry()
+  const material = new THREE.MeshBasicMaterial({
+    color: 0x00ff00,
+    wireframe: true,
+  })
 
-  for (let i = 0; i < particleCount; i++) {
-    const i3 = i * 3
-    const theta = Math.random() * Math.PI * 2
-    const phi = Math.acos(Math.random() * 2 - 1)
-    positions[i3] = radius * Math.sin(phi) * Math.cos(theta)
-    positions[i3 + 1] = radius * Math.sin(phi) * Math.sin(theta)
-    positions[i3 + 2] = radius * Math.cos(phi)
-  }
-
-  particlesGeometry.setAttribute(
-    'position',
-    new THREE.BufferAttribute(positions, 3)
-  )
-  particleMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 1 })
-  particles = new THREE.Points(particlesGeometry, particleMaterial)
-  scene.add(particles)
-
-  // Controls setup
-  controls = new OrbitControls(camera, renderer.domElement)
-  controls.enableDamping = true
-  controls.dampingFactor = 0.25
-
-  // Set minimum and maximum distance for zoom
-  controls.minDistance = 200 // Adjust as needed
-  controls.maxDistance = 400 // Adjust as needed
+  const cube = new THREE.Mesh(geometry, material)
+  cube.position.set(0, 0.5, -10)
+  scene.add(cube)
 
   // Resize handling
   window.addEventListener('resize', onWindowResize)
+
+  //add an animation that flashes the cube through 100 percent of scroll
+  animationScripts.value.push({
+    start: 0,
+    end: 101,
+    func: () => {
+      let g = material.color.g
+      g -= 0.05
+      if (g <= 0) {
+        g = 1.0
+      }
+      material.color.g = g
+    },
+  })
+
+  //add an animation that moves the cube through first 40 percent of scroll
+  animationScripts.value.push({
+    start: 0,
+    end: 40,
+    func: () => {
+      camera.lookAt(cube.position)
+      camera.position.set(0, 1, 2)
+      cube.position.z = lerp(-10, 0, scalePercent(0, 40))
+      //console.log(cube.position.z)
+    },
+  })
+
+  //add an animation that rotates the cube between 40-60 percent of scroll
+  animationScripts.value.push({
+    start: 40,
+    end: 60,
+    func: () => {
+      camera.lookAt(cube.position)
+      camera.position.set(0, 1, 2)
+      cube.rotation.z = lerp(0, Math.PI, scalePercent(40, 60))
+      //console.log(cube.rotation.z)
+    },
+  })
+
+  //add an animation that moves the camera between 60-80 percent of scroll
+  animationScripts.value.push({
+    start: 60,
+    end: 80,
+    func: () => {
+      camera.position.x = lerp(0, 5, scalePercent(60, 80))
+      camera.position.y = lerp(1, 5, scalePercent(60, 80))
+      camera.lookAt(cube.position)
+      //console.log(camera.position.x + " " + camera.position.y)
+    },
+  })
+
+  //add an animation that auto rotates the cube from 80 percent of scroll
+  animationScripts.value.push({
+    start: 80,
+    end: 101,
+    func: () => {
+      //auto rotate
+      cube.rotation.x += 0.01
+      cube.rotation.y += 0.01
+    },
+  })
+
+  document.body.onscroll = () => {
+    //calculate the current scroll progress as a percentage
+    scrollPercent.value =
+      ((document.documentElement.scrollTop || document.body.scrollTop) /
+        ((document.documentElement.scrollHeight || document.body.scrollHeight) -
+          document.documentElement.clientHeight)) *
+      100
+  }
+  stats.value = new Stats()
+  document.body.appendChild(stats.value.dom)
 }
 
-// Inside animate() function
-// Inside animate() function
+function playScrollAnimations() {
+  animationScripts.value.forEach(a => {
+    if (scrollPercent.value >= a.start && scrollPercent.value < a.end) {
+      a.func()
+    }
+  })
+}
+
 function animate() {
   requestAnimationFrame(animate)
+  playScrollAnimations()
+
   render()
+
+  stats.value.update()
 }
 
 function render() {
-  // Update particles based on scroll position
-  const scrollRatio =
-    scrollY.value / (document.body.scrollHeight - window.innerHeight)
-  particles.material.size = 1 - scrollRatio * 0.9
-
   // Update controls
-  controls.update()
+  //   controls.update()
 
   // Render scene
   renderer.render(scene, camera)
@@ -114,12 +196,16 @@ function onWindowResize() {
 function dispose() {
   // Dispose Three.js objects
   renderer.dispose()
-  scene.dispose()
+  //   scene.dispose()
 }
 </script>
 
 <style lang="postcss">
 .scrollytelling {
+  .section {
+    height: 100vh;
+    position: relative;
+  }
   .logo {
     pointer-events: none;
     position: absolute;
@@ -135,6 +221,12 @@ function dispose() {
       position: relative;
       color: white;
     }
+  }
+
+  .container {
+    position: fixed;
+    top: 0;
+    left: 0;
   }
 }
 </style>
