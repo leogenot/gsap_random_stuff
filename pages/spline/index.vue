@@ -1,26 +1,29 @@
 <script setup>
 const spline = ref(null)
-const updateLoaded = () => {
-  console.log('Loaded spline')
-}
-const handleSplineError = () => {
-  console.log('Error spline')
-}
 </script>
 
 <template>
-  <client-only>
-    <spline-canvas
-      class="spline"
-      ref="spline"
-      url="https://prod.spline.design/y8EZ991SIP1GwVZy/scene.splinecode"
-    />
-    <!-- @loaded="updateLoaded"
-      @error="handleSplineError" -->
-  </client-only>
+  <div class="page">
+    <client-only>
+      <spline-canvas
+        class="spline"
+        ref="spline"
+        url="https://prod.spline.design/df8JfXNqQfOi5qVq/scene.splinecode"
+      />
+    </client-only>
+  </div>
 </template>
 
 <style lang="postcss">
-.module-spline {
+.page {
+  height: 400vh;
+  .spline {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 50vh;
+    width: 50vw;
+  }
 }
 </style>

@@ -19,30 +19,30 @@ const splineInstance = ref(null)
 const loaded = ref(false)
 const emit = defineEmits(['loaded', 'error'])
 
-const play = () => splineInstance.value?.play()
-const pause = () => splineInstance.value?.stop()
-const setVariables = variables => splineInstance.value?.setVariables(variables)
+const play = () => splineInstance.value.play()
+const pause = () => splineInstance.value.stop()
+const setVariables = variables => splineInstance.value.setVariables(variables)
 const setVariable = (name, value) =>
-  splineInstance.value?.setVariable(name, value)
-const getVariables = () => splineInstance.value?.getVariables()
-const getVariable = name => splineInstance.value?.getVariable(name)
-const stop = () => splineInstance.value?.stop()
+  splineInstance.value.setVariable(name, value)
+const getVariables = () => splineInstance.value.getVariables()
+const getVariable = name => splineInstance.value.getVariable(name)
+const stop = () => splineInstance.value.stop()
 const setBackgroundColor = color =>
-  splineInstance.value?.setBackgroundColor(color)
-const getAllObjects = () => splineInstance.value?.getAllObjects()
-const getSplineEvents = () => splineInstance.value?.getSplineEvents()
-const setZoom = zoom => splineInstance.value?.setZoom(zoom)
-const setSize = (width, height) => splineInstance.value?.setSize(width, height)
-const findObjectById = uuid => splineInstance.value?.findObjectById(uuid)
-const findObjectByName = name => splineInstance.value?.findObjectByName(name)
+  splineInstance.value.setBackgroundColor(color)
+const getAllObjects = () => splineInstance.value.getAllObjects()
+const getSplineEvents = () => splineInstance.value.getSplineEvents()
+const setZoom = zoom => splineInstance.value.setZoom(zoom)
+const setSize = (width, height) => splineInstance.value.setSize(width, height)
+const findObjectById = uuid => splineInstance.value.findObjectById(uuid)
+const findObjectByName = name => splineInstance.value.findObjectByName(name)
 const emitEvent = (eventName, nameOrUuid) =>
-  splineInstance.value?.emitEvent(eventName, nameOrUuid)
+  splineInstance.value.emitEvent(eventName, nameOrUuid)
 const emitEventReverse = (eventName, nameOrUuid) =>
-  splineInstance.value?.emitEventReverse(eventName, nameOrUuid)
+  splineInstance.value.emitEventReverse(eventName, nameOrUuid)
 const addEventListener = (eventName, cb) =>
-  splineInstance.value?.addEventListener(eventName, cb)
+  splineInstance.value.addEventListener(eventName, cb)
 const removeEventListener = (eventName, cb) =>
-  splineInstance.value?.removeEventListener(eventName, cb)
+  splineInstance.value.removeEventListener(eventName, cb)
 
 defineExpose({
   play,
