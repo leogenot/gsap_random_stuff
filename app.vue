@@ -1,11 +1,18 @@
 <template>
-  <!-- <circle-gallery /> -->
-  <stacked-slider />
-  <!-- <scroll-trigger-gallery /> -->
-  <!-- <infinite-scroll-gallery /> -->
-  <!-- <gallery /> -->
-  <!-- <mouse-trail /> -->
-  <!-- <minimap-gallery /> -->
-  <!-- <scroll-animation /> -->
-  <!-- <circular-gallery /> -->
+  <nuxt-layout>
+    <nuxt-page />
+  </nuxt-layout>
 </template>
+
+<script setup>
+import { gsap, ScrollTrigger } from 'gsap/all'
+gsap.registerPlugin(ScrollTrigger)
+const route = useRoute()
+watch(
+  () => route.path,
+  () => {
+    console.log('route changed')
+    ScrollTrigger.refresh()
+  }
+)
+</script>

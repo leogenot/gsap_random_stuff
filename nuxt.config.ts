@@ -6,6 +6,7 @@ export default defineNuxtConfig({
   modules: [
     '@vueuse/nuxt',
     '@nuxtjs/device',
+    'nuxt-icons',
   ],
 
   device: {
@@ -14,4 +15,8 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
   postcss: postcss,
+
+  build: {
+    transpile: ["three"],
+  },
 })
