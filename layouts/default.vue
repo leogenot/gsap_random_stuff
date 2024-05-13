@@ -44,6 +44,18 @@ const options = [
     value: 'spline',
   },
   {
+    name: 'three-pencil-material',
+    value: 'three-pencil-material',
+  },
+  {
+    name: 'three-scroll',
+    value: 'three-scroll',
+  },
+  {
+    name: 'svg-card',
+    value: 'svg-card',
+  },
+  {
     name: 'slider',
     value: 'slider',
   },

@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@nuxt/devtools": "latest",
+    "@nuxt/image": "^1.7.0",
     "@nuxtjs/device": "^3.1.1",
     "@splinetool/runtime": "^1.2.8",
     "@types/three": "^0.164.0",

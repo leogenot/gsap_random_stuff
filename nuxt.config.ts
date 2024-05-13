@@ -3,11 +3,7 @@ import postcss from './postcss-config'
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
-  modules: [
-    '@vueuse/nuxt',
-    '@nuxtjs/device',
-    'nuxt-icons',
-  ],
+  modules: ['@vueuse/nuxt', '@nuxtjs/device', 'nuxt-icons', "@nuxt/image"],
 
   device: {
     refreshOnResize: true
