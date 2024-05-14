@@ -117,17 +117,17 @@ function init() {
   stats.value = new Stats()
   document.body.appendChild(stats.value.dom)
 
-  gsap.to(torus.rotation, {
-    y: Math.PI * 2,
-    x: Math.PI * 2,
+  // gsap.to(torus.rotation, {
+  //   y: Math.PI * 2,
+  //   x: Math.PI * 2,
 
-    scrollTrigger: {
-      trigger: scrolytelling.value,
-      scrub: 1,
-      start: 'top 0',
-      end: 'bottom top',
-    },
-  })
+  //   scrollTrigger: {
+  //     trigger: scrolytelling.value,
+  //     scrub: 1,
+  //     start: 'top 0',
+  //     end: 'bottom top',
+  //   },
+  // })
   gsap.to(
     camera.position,
     {
@@ -160,6 +160,17 @@ function updateTorusPosition() {
     duration: 0.5,
     ease: 'power2.out',
   })
+
+  gsap.to(
+    torus.rotation,
+    {
+      x: -translationX,
+      y: -translationY,
+      duration: 0.5,
+      ease: 'power2.out',
+    },
+    '<'
+  )
 }
 
 function animate() {
@@ -223,6 +234,7 @@ function dispose() {
     transform: translate(-50%, -50%);
     height: 50vh;
     width: 50vw;
+    pointer-events: none;
     canvas {
       width: 100%;
       height: 100%;
