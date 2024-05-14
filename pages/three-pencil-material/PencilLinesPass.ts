@@ -45,7 +45,7 @@ export class PencilLinesPass extends Pass {
         this.material.uniforms.uResolution.value = new THREE.Vector2(width, height)
 
         const loader = new THREE.TextureLoader()
-        loader.load('../../public/images/cloud-noise.png', (texture) => {
+        loader.load('/images/cloud-noise.png', (texture) => {
             this.material.uniforms.uTexture.value = texture
         })
     }

@@ -60,19 +60,10 @@ function init() {
   const geometry = new THREE.TorusKnotGeometry(1, 0.3, 200, 32)
   const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 })
   const torus = new THREE.Mesh(geometry, material)
-  torus.castShadow = true
+  // torus.castShadow = true
   torus.rotation.y = Math.PI / 4
-  torus.position.set(0, 1, 0)
+  torus.position.set(0, 0, 0)
   scene.add(torus)
-
-  const plane = new THREE.Mesh(
-    new THREE.PlaneGeometry(10, 10),
-    new THREE.MeshStandardMaterial({ color: 0xffffff })
-  )
-  plane.rotation.x = -Math.PI / 2
-  plane.position.y = -0.75
-  plane.receiveShadow = true
-  scene.add(plane)
 
   camera.position.z = 5
   camera.position.y = 2
@@ -172,7 +163,7 @@ function dispose() {
       width: 100%;
       height: 100%;
       position: relative;
-      color: white;
+      color: red;
     }
   }
 
