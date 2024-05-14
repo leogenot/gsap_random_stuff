@@ -115,15 +115,31 @@ function init() {
   document.body.appendChild(stats.value.dom)
 
   gsap.to(torus.rotation, {
-    y: Math.PI * 2, // 360 degrees in radians
-    ease: 'power1.inOut', // Easing function
+    y: Math.PI * 2,
+    x: Math.PI * 2,
+
     scrollTrigger: {
       trigger: scrolytelling.value,
-      scrub: 1, // Smoothly snap to scrolling
-      start: 'top 0', // Start when the top of the trigger element reaches the top of the viewport
-      end: 'bottom top', // End when the top of the viewport reaches the top of the trigger element
+      scrub: 1,
+      start: 'top 0',
+      end: 'bottom top',
     },
   })
+  gsap.to(
+    camera.position,
+    {
+      y: 2,
+      z: 5,
+
+      scrollTrigger: {
+        trigger: scrolytelling.value,
+        scrub: 1,
+        start: 'top 0',
+        end: 'bottom top',
+      },
+    },
+    '<'
+  )
 }
 function animate() {
   requestAnimationFrame(animate)
