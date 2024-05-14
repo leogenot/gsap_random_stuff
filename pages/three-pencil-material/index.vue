@@ -49,7 +49,7 @@ function init() {
 
   // Camera setup
   camera = new THREE.PerspectiveCamera(
-    75,
+    120,
     window.innerWidth / window.innerHeight,
     0.1,
     1000
@@ -112,6 +112,9 @@ function init() {
         ((document.documentElement.scrollHeight || document.body.scrollHeight) -
           document.documentElement.clientHeight)) *
       100
+
+    //rotate torus according to the scroll:
+    torus.rotation.y = (Math.PI / 4) * scrollPercent.value
   }
   stats.value = new Stats()
   document.body.appendChild(stats.value.dom)
