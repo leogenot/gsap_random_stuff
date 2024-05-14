@@ -15,14 +15,4 @@ watch(
     ScrollTrigger.refresh()
   }
 )
-
-useHead({
-  script: [
-    {
-      src: 'https://unpkg.com/@splinetool/viewer@1.3.1/build/spline-viewer.js',
-      type: 'module',
-      async: false,
-    },
-  ],
-})
 </script>
