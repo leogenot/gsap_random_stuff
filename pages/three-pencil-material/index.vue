@@ -1,11 +1,7 @@
 <template>
   <div class="scrollytelling">
     <div class="section"><NuxtIcon ref="logo" class="logo" name="logo" /></div>
-    <div
-      ref="container"
-      class="container"
-      style="width: 100%; height: 100vh"
-    ></div>
+    <div ref="container" class="container"></div>
   </div>
 </template>
 
@@ -79,7 +75,7 @@ function init() {
   scene.add(hemisphereLight)
 
   renderer = new THREE.WebGLRenderer()
-  renderer.setSize(window.innerWidth, window.innerHeight)
+  renderer.setSize(container.value.clientWidth, container.value.clientHeight)
   renderer.setClearColor('#eee')
   renderer.physicallyCorrectLights = true
   renderer.outputEncoding = THREE.sRGBEncoding
@@ -115,6 +111,7 @@ function init() {
 
     //rotate torus according to the scroll:
     torus.rotation.y = (Math.PI / 4) * scrollPercent.value
+    console.log(scrollPercent.value)
   }
   stats.value = new Stats()
   document.body.appendChild(stats.value.dom)
@@ -137,9 +134,12 @@ function onScroll() {
 }
 
 function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight
+  const width = container.value.clientWidth
+  const height = container.value.clientHeight
+
+  renderer.setSize(width, height)
+  camera.aspect = width / height
   camera.updateProjectionMatrix()
-  renderer.setSize(window.innerWidth, window.innerHeight)
 }
 
 function dispose() {
@@ -150,12 +150,12 @@ function dispose() {
 <style lang="postcss">
 .scrollytelling {
   .section {
-    height: 100vh;
+    height: 400vh;
     position: relative;
   }
   .logo {
     pointer-events: none;
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -172,8 +172,15 @@ function dispose() {
 
   .container {
     position: fixed;
-    top: 0;
-    left: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 50vh;
+    width: 50vw;
+    canvas {
+      width: 100%;
+      height: 100%;
+    }
   }
 }
 </style>
