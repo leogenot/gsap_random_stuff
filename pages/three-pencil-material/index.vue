@@ -1,12 +1,13 @@
 <template>
-  <div class="scrollytelling">
+  <div class="scrollytelling" ref="scrolytelling">
     <div class="section"><NuxtIcon ref="logo" class="logo" name="logo" /></div>
     <div ref="container" class="container"></div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { gsap, ScrollTrigger } from 'gsap/all'
+gsap.registerPlugin(ScrollTrigger)
 import * as THREE from 'three'
 import Stats from 'three/examples/jsm/libs/stats.module'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
@@ -27,6 +28,7 @@ const container = ref(null)
 const scrollY = ref(window?.scrollY)
 const animationScripts = ref([])
 const stats = ref(null)
+const scrolytelling = ref(null)
 
 onMounted(() => {
   init()
@@ -57,12 +59,12 @@ function init() {
   const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 })
   const torus = new THREE.Mesh(geometry, material)
   // torus.castShadow = true
-  torus.rotation.y = Math.PI / 4
+  // torus.rotation.y = Math.PI / 4
   torus.position.set(0, 0, 0)
   scene.add(torus)
 
-  camera.position.z = 5
-  camera.position.y = 2
+  camera.position.z = 1
+  camera.position.y = 0.2
 
   const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
   directionalLight.castShadow = true
@@ -108,15 +110,21 @@ function init() {
         ((document.documentElement.scrollHeight || document.body.scrollHeight) -
           document.documentElement.clientHeight)) *
       100
-
-    //rotate torus according to the scroll:
-    torus.rotation.y = (Math.PI / 4) * scrollPercent.value
-    console.log(scrollPercent.value)
   }
   stats.value = new Stats()
   document.body.appendChild(stats.value.dom)
-}
 
+  gsap.to(torus.rotation, {
+    y: Math.PI * 2, // 360 degrees in radians
+    ease: 'power1.inOut', // Easing function
+    scrollTrigger: {
+      trigger: scrolytelling.value,
+      scrub: 1, // Smoothly snap to scrolling
+      start: 'top 0', // Start when the top of the trigger element reaches the top of the viewport
+      end: 'bottom top', // End when the top of the viewport reaches the top of the trigger element
+    },
+  })
+}
 function animate() {
   requestAnimationFrame(animate)
   render()
