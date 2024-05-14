@@ -52,6 +52,10 @@ const options = [
     value: 'three-scroll',
   },
   {
+    name: 'spline-benchmark',
+    value: 'spline-benchmark',
+  },
+  {
     name: 'svg-card',
     value: 'svg-card',
   },

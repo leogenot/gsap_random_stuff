@@ -1,7 +1,6 @@
 <script setup>
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
-// import { mergeBufferGeometries } from 'three/addons/utils/THREE..js'
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js'
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js'
 import { gsap, ScrollTrigger } from 'gsap/all'
@@ -131,7 +130,7 @@ onMounted(() => {
     setGeometryHierarchy()
 
     const material = new THREE.MeshStandardMaterial({
-      color: new THREE.Color(0x9c8d7b),
+      color: new THREE.Color(0x9c8d7a),
       side: THREE.DoubleSide,
     })
     box.els.group.traverse(c => {
