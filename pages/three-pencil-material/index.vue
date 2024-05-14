@@ -22,18 +22,21 @@ let scene,
   controls,
   composer,
   renderPass,
-  pencilLinePass
+  pencilLinePass,
+  torus
 const scrollPercent = ref(0)
 const container = ref(null)
 const scrollY = ref(window?.scrollY)
 const animationScripts = ref([])
 const stats = ref(null)
 const scrolytelling = ref(null)
-
+const mouseX = ref(0)
+const mouseY = ref(0)
 onMounted(() => {
   init()
   animate()
   window.addEventListener('scroll', onScroll)
+  window.addEventListener('mousemove', onMouseMove)
 })
 
 onUnmounted(() => {
@@ -57,7 +60,7 @@ function init() {
   // Renderer setup
   const geometry = new THREE.TorusKnotGeometry(1, 0.3, 200, 32)
   const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 })
-  const torus = new THREE.Mesh(geometry, material)
+  torus = new THREE.Mesh(geometry, material)
   // torus.castShadow = true
   // torus.rotation.y = Math.PI / 4
   torus.position.set(0, 0, 0)
@@ -141,9 +144,28 @@ function init() {
     '<'
   )
 }
+
+function onMouseMove(event) {
+  mouseX.value = (event.clientX / window.innerWidth) * 2 - 1
+  mouseY.value = -(event.clientY / window.innerHeight) * 2 + 1
+}
+
+function updateTorusPosition() {
+  const translationX = mouseX.value * 0.1
+  const translationY = mouseY.value * 0.1
+
+  gsap.to(torus.position, {
+    x: -translationX,
+    y: -translationY,
+    duration: 0.5,
+    ease: 'power2.out',
+  })
+}
+
 function animate() {
   requestAnimationFrame(animate)
   render()
+  updateTorusPosition()
   stats.value.update()
 }
 
