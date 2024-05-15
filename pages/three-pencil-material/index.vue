@@ -1,33 +1,25 @@
 <template>
   <div class="scrollytelling" ref="scrolytelling">
     <div class="section"><NuxtIcon ref="logo" class="logo" name="logo" /></div>
-    <div ref="container" class="container"></div>
+    <div
+      ref="container"
+      class="container"
+      :class="{ 'is-loaded': isLoaded }"
+    ></div>
   </div>
 </template>
 
 <script setup>
-import { gsap, ScrollTrigger } from 'gsap/all'
-gsap.registerPlugin(ScrollTrigger)
+import { gsap } from 'gsap/all'
 import * as THREE from 'three'
 import Stats from 'three/examples/jsm/libs/stats.module'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { PencilLinesPass } from './PencilLinesPass'
-let scene,
-  camera,
-  renderer,
-  particles,
-  particleMaterial,
-  controls,
-  composer,
-  renderPass,
-  pencilLinePass,
-  torus
-const scrollPercent = ref(0)
+let scene, camera, renderer, composer, renderPass, pencilLinePass, torus
+const isLoaded = ref(false)
 const container = ref(null)
 const scrollY = ref(window?.scrollY)
-const animationScripts = ref([])
 const stats = ref(null)
 const scrolytelling = ref(null)
 const mouseX = ref(0)
@@ -62,7 +54,6 @@ function init() {
   const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 })
   torus = new THREE.Mesh(geometry, material)
   // torus.castShadow = true
-  // torus.rotation.y = Math.PI / 4
   torus.position.set(0, 0, 0)
   scene.add(torus)
 
@@ -102,32 +93,11 @@ function init() {
   composer.addPass(renderPass)
   composer.addPass(pencilLinePass)
 
-  controls = new OrbitControls(camera, renderer.domElement)
   container.value.appendChild(renderer.domElement)
-  // Resize handling
   window.addEventListener('resize', onWindowResize)
-  document.body.onscroll = () => {
-    //calculate the current scroll progress as a percentage
-    scrollPercent.value =
-      ((document.documentElement.scrollTop || document.body.scrollTop) /
-        ((document.documentElement.scrollHeight || document.body.scrollHeight) -
-          document.documentElement.clientHeight)) *
-      100
-  }
   stats.value = new Stats()
   document.body.appendChild(stats.value.dom)
 
-  // gsap.to(torus.rotation, {
-  //   y: Math.PI * 2,
-  //   x: Math.PI * 2,
-
-  //   scrollTrigger: {
-  //     trigger: scrolytelling.value,
-  //     scrub: 1,
-  //     start: 'top 0',
-  //     end: 'bottom top',
-  //   },
-  // })
   gsap.to(
     camera.position,
     {
@@ -181,9 +151,8 @@ function animate() {
 }
 
 function render() {
-  controls.update()
   composer.render()
-  //   renderer.render(scene, camera)
+  isLoaded.value = true
 }
 
 function onScroll() {
@@ -235,9 +204,17 @@ function dispose() {
     height: 50vh;
     width: 50vw;
     pointer-events: none;
+    opacity: 0;
+    filter: blur(20px);
+    transition: opacity 0.5s ease-in-out, filter 0.5s ease-in-out;
     canvas {
       width: 100%;
       height: 100%;
+    }
+
+    &.is-loaded {
+      opacity: 1;
+      filter: blur(0);
     }
   }
 }
