@@ -44,7 +44,6 @@ function init() {
   light.position.set(0, 0, 10)
   scene.add(light)
 
-  // Composer setup
   composer = new EffectComposer(renderer)
   renderPass = new RenderPass(scene, camera)
   pencilLinePass = new PencilLinesPass({
@@ -56,7 +55,6 @@ function init() {
   composer.addPass(renderPass)
   composer.addPass(pencilLinePass)
 
-  // Additional setup
   window.addEventListener('resize', onWindowResize)
 }
 
@@ -77,18 +75,13 @@ function onWindowResize() {
 }
 
 function cleanUpThree(scene, renderer) {
-  console.log('dispose scene!', scene)
   scene.traverse(object => {
-    console.log('dispose object!', object)
     if (!object.isMesh) return
-
-    console.log('dispose geometry!')
     object.geometry.dispose()
 
     if (object.material.isMaterial) {
       cleanMaterial(object.material)
     } else {
-      // an array of materials
       for (const material of object.material) cleanMaterial(material)
     }
   })
@@ -100,21 +93,18 @@ function cleanUpThree(scene, renderer) {
 }
 
 const cleanMaterial = material => {
-  console.log('dispose material!')
   material.dispose()
 
   // dispose textures
   for (const key of Object.keys(material)) {
     const value = material[key]
     if (value && typeof value === 'object' && 'minFilter' in value) {
-      console.log('dispose texture!')
       value.dispose()
     }
   }
 }
 
 function cleanUp() {
-  console.log('clean up')
   cleanUpThree(scene, renderer)
   window.removeEventListener('resize', onWindowResize)
   isLoaded.value = false
@@ -126,7 +116,6 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  console.log('onBeforeUnmount')
   cleanUp()
 })
 </script>
