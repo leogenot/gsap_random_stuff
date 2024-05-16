@@ -51,6 +51,11 @@ const options = [
     name: 'three-scroll',
     value: 'three-scroll',
   },
+
+  {
+    name: 'three-drop',
+    value: 'three-drop',
+  },
   {
     name: 'spline-benchmark',
     value: 'spline-benchmark',
