@@ -120,7 +120,7 @@ onMounted(() => {
     const box = new THREE.BoxHelper(mesh, 0xffff00)
     // scene.add(box)
 
-    init(scene, mesh)
+    init(mesh)
     shaderControls.shapeGroupPosition.y = 2.3
     shaderControls.shapeGroupScale.x = 1.2
     shaderControls.shapeGroupScale.y = 1.2

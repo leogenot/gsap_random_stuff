@@ -4,8 +4,8 @@ import * as THREE from 'three'
 import { vertexShader } from './vertexShader'
 import { fragmentShader } from './fragmentShader'
 
-function init(scene, mesh) {
-    createPrimitive(scene, mesh);
+function init(mesh) {
+    createPrimitive(mesh);
     animation();
 }
 
@@ -20,7 +20,7 @@ var start = Date.now();
 
 //--------------------------------------------------------------------
 class primitiveElement {
-    constructor(scene, mesh) {
+    constructor(mesh) {
         this.mesh = new THREE.Object3D();
         mat = new THREE.ShaderMaterial({
             side: THREE.DoubleSide,
@@ -104,11 +104,11 @@ class primitiveElement {
         shapeGroup.remove(this.shape);
     }
 }
-function createPrimitive(scene, mesh) {
+function createPrimitive(mesh) {
     if (_primitive) {
         _primitive.dispose();
     }
-    _primitive = new primitiveElement(scene, mesh);
+    _primitive = new primitiveElement(mesh);
 }
 
 var options = {
@@ -120,13 +120,13 @@ var options = {
         displace: .1,
         complex: 0.50,
         waves: 2.5,
-        eqcolor: 15,
-        rcolor: 0,
-        gcolor: 1.9,
-        bcolor: 0,
+        eqcolor: 9.0,
+        rcolor: 0.4,
+        gcolor: 0.05,
+        bcolor: 0.6,
         fragment: true,
         points: true,
-        redhell: true
+        redhell: false
     },
     perlinRandom: function () {
         gsap.to(this.perlin, {
