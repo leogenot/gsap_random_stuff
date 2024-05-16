@@ -284,6 +284,7 @@ function animation() {
 export default () => {
     return {
         init,
-        controls
+        controls,
+        options
     }
 }
