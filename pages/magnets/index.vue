@@ -268,10 +268,14 @@ onMounted(() => {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 70px;
+    /* width: 70px; */
     height: 100px;
+    aspect-ratio: 1/1;
     background: #b0b0b0;
     margin: 10px;
+
+    border-radius: 100%;
+    overflow: hidden;
   }
 
   img {
