@@ -28,6 +28,10 @@ const options = [
     value: 'text-avoid',
   },
   {
+    name: 'magnets',
+    value: 'magnets',
+  },
+  {
     name: 'loader',
     value: 'loader',
   },
