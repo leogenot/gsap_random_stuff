@@ -57,6 +57,10 @@ const options = [
     value: 'three-drop',
   },
   {
+    name: 'scrolltrigger-card-stack',
+    value: 'scrolltrigger-card-stack',
+  },
+  {
     name: 'spline-benchmark',
     value: 'spline-benchmark',
   },
