@@ -61,6 +61,10 @@ const options = [
     value: 'scrolltrigger-card-stack',
   },
   {
+    name: 'floating-items',
+    value: 'floating-items',
+  },
+  {
     name: 'spline-benchmark',
     value: 'spline-benchmark',
   },

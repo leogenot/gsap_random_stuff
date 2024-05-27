@@ -24,7 +24,9 @@ onMounted(() => {
     window.addEventListener('mousemove', e => {
       const { target, x, y } = e
       const isTargetLinkOrBtn =
-        target?.closest('a') || target?.closest('button')
+        target?.closest('a') ||
+        target?.closest('button') ||
+        target?.closest('.svg-card')
       gsap.to(mouse, {
         x: x - 10,
         y: y - 10,
