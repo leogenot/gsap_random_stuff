@@ -8,6 +8,9 @@
       class="container"
       :class="{ 'is-loaded': isLoaded }"
     ></div>
+    <div class="section section-2">
+      <NuxtIcon ref="logo" class="logo" name="logo" />
+    </div>
   </div>
 </template>
 
@@ -240,13 +243,16 @@ onUnmounted(() => {
 <style lang="postcss">
 .three-drop {
   .section {
-    height: 400vh;
+    height: 200vh;
     position: relative;
     background-color: #1f1e1c;
+    &-2 {
+      background-color: #f0f0f0;
+    }
   }
   .logo {
     pointer-events: none;
-    position: fixed;
+    position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -275,6 +281,7 @@ onUnmounted(() => {
     canvas {
       width: 100%;
       height: 100%;
+      border: 1px solid red;
     }
 
     &.is-loaded {
