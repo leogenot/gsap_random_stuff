@@ -9,6 +9,7 @@
       :class="{ 'is-loaded': isLoaded }"
     ></div>
     <div class="section section-2">
+      <NuxtIcon class="grainy-drop" name="grainyDrop" />
       <NuxtIcon ref="logo" class="logo" name="logo" />
     </div>
   </div>
@@ -64,13 +65,88 @@ const {
   options: shaderOptions,
 } = useThreeBlob()
 
+const fitCameraToCenteredObject = function (
+  camera,
+  object,
+  offset,
+  orbitControls
+) {
+  const boundingBox = new THREE.Box3()
+  boundingBox.setFromObject(object)
+
+  var middle = new THREE.Vector3()
+  var size = new THREE.Vector3()
+  boundingBox.getSize(size)
+
+  // figure out how to fit the box in the view:
+  // 1. figure out horizontal FOV (on non-1.0 aspects)
+  // 2. figure out distance from the object in X and Y planes
+  // 3. select the max distance (to fit both sides in)
+  //
+  // The reason is as follows:
+  //
+  // Imagine a bounding box (BB) is centered at (0,0,0).
+  // Camera has vertical FOV (camera.fov) and horizontal FOV
+  // (camera.fov scaled by aspect, see fovh below)
+  //
+  // Therefore if you want to put the entire object into the field of view,
+  // you have to compute the distance as: z/2 (half of Z size of the BB
+  // protruding towards us) plus for both X and Y size of BB you have to
+  // figure out the distance created by the appropriate FOV.
+  //
+  // The FOV is always a triangle:
+  //
+  //  (size/2)
+  // +--------+
+  // |       /
+  // |      /
+  // |     /
+  // | F° /
+  // |   /
+  // |  /
+  // | /
+  // |/
+  //
+  // F° is half of respective FOV, so to compute the distance (the length
+  // of the straight line) one has to: `size/2 / Math.tan(F)`.
+  //
+  // FTR, from https://threejs.org/docs/#api/en/cameras/PerspectiveCamera
+  // the camera.fov is the vertical FOV.
+
+  const fov = camera.fov * (Math.PI / 180)
+  const fovh = 2 * Math.atan(Math.tan(fov / 2) * camera.aspect)
+  let dx = size.z / 2 + Math.abs(size.x / 2 / Math.tan(fovh / 2))
+  let dy = size.z / 2 + Math.abs(size.y / 2 / Math.tan(fov / 2))
+  let cameraZ = Math.max(dx, dy)
+
+  // offset the camera, if desired (to avoid filling the whole canvas)
+  if (offset !== undefined && offset !== 0) cameraZ *= offset
+
+  camera.position.set(0, 0, cameraZ)
+
+  // set the far plane of the camera so that it easily encompasses the whole object
+  const minZ = boundingBox.min.z
+  const cameraToFarEdge = minZ < 0 ? -minZ + cameraZ : cameraZ - minZ
+
+  camera.far = cameraToFarEdge * 3
+  camera.updateProjectionMatrix()
+
+  if (orbitControls !== undefined) {
+    // set camera to rotate around the center
+    orbitControls.target = new THREE.Vector3(0, 0, 0)
+
+    // prevent camera from zooming out far enough to create far plane cutoff
+    orbitControls.maxDistance = cameraToFarEdge * 2
+  }
+}
+
 onMounted(() => {
   scene = new THREE.Scene()
   camera = new THREE.PerspectiveCamera(
-    75,
+    1,
     window.innerWidth / window.innerHeight,
-    0.1,
-    1000
+    0.01,
+    100
   )
   camera.position.z = 2
   camera.position.y = 1
@@ -129,13 +205,22 @@ onMounted(() => {
 
     geometry.translate(0, 0, 0)
     geometry.scale(0.01, 0.01, 0.01)
+    var middle = new THREE.Vector3()
+    geometry.computeBoundingBox()
+    geometry.boundingBox.getCenter(middle)
 
     mesh = new THREE.Mesh(geometry, material.value)
     mesh.scale.set(0.25, 0.25, 0.25)
     scene.add(mesh)
+    mesh.geometry.applyMatrix4(
+      new THREE.Matrix4().makeTranslation(-middle.x, -middle.y, -middle.z)
+    )
+
+    const box = new THREE.BoxHelper(mesh, 0xffff00)
+    scene.add(box)
 
     init(mesh)
-    shaderControls.shapeGroupPosition.y = 2.3
+    shaderControls.shapeGroupPosition.y = -1
     shaderControls.shapeGroupScale.x = 1.2
     shaderControls.shapeGroupScale.y = 1.2
     shaderControls.shapeGroupScale.z = 1.2
@@ -146,7 +231,7 @@ onMounted(() => {
       child.geometry.dispose()
       child.material.dispose()
     })
-
+    fitCameraToCenteredObject(camera, mesh)
     gsap.to(mesh.rotation, {
       y: 3,
 
@@ -248,6 +333,7 @@ onUnmounted(() => {
     background-color: #1f1e1c;
     &-2 {
       background-color: #f0f0f0;
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
     }
   }
   .logo {
@@ -264,6 +350,20 @@ onUnmounted(() => {
       height: 100%;
       position: relative;
       color: red;
+    }
+  }
+
+  .grainy-drop {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 50vh;
+    width: 50vw;
+    pointer-events: none;
+    svg {
+      width: 100%;
+      height: 100%;
     }
   }
 
