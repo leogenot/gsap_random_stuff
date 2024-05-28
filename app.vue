@@ -23,23 +23,23 @@ onMounted(() => {
     const mouse = document.querySelector('.mouse')
     gsap.set(mouse, { xPercent: -50, yPercent: -50 })
     let xTo = gsap.quickTo(mouse, 'x', { duration: 0.7, ease: 'power3' }),
-      yTo = gsap.quickTo(mouse, 'y', { duration: 0.7, ease: 'power3' }),
-      opacityTo = gsap.quickTo(mouse, 'opacity', {
-        duration: 0.7,
-        ease: 'power3',
-      }),
-      scaleTo = gsap.quickTo(mouse, 'scale', { duration: 0.7, ease: 'power3' })
+      yTo = gsap.quickTo(mouse, 'y', { duration: 0.7, ease: 'power3' })
     window.addEventListener('mousemove', e => {
       const { target, x, y } = e
       const isTargetLinkOrBtn =
         target?.closest('a') ||
         target?.closest('button') ||
-        target?.closest('.svg-card')
+        target?.closest('.svg-card') ||
+        target?.closest('.magnetic')
 
       xTo(e.clientX)
       yTo(e.clientY)
-      opacityTo(isTargetLinkOrBtn ? 0.6 : 1)
-      scaleTo(isTargetLinkOrBtn ? 3 : 1)
+      gsap.to(mouse, {
+        duration: 0.7,
+        ease: 'power2',
+        opacity: isTargetLinkOrBtn ? 0.6 : 1,
+        scale: isTargetLinkOrBtn ? 3 : 1,
+      })
     })
 
     document.addEventListener('mouseleave', e => {
