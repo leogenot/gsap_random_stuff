@@ -13,7 +13,8 @@
       <NuxtIcon ref="logo" class="logo" name="logo" />
     </div>
     <div class="section section-3">
-      <NuxtImg class="grainy-drop" src="images/waterDropClear.png" />
+      <!-- <NuxtImg class="grainy-drop" src="images/waterDropClear.png" /> -->
+      <grainy-drop class="grainy-drop"></grainy-drop>
       <NuxtIcon ref="logo" class="logo" name="logo" />
     </div>
   </div>
@@ -352,6 +353,12 @@ onUnmounted(() => {
       height: 100%;
       object-fit: contain;
     } */
+
+    svg {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
   }
 
   .container {

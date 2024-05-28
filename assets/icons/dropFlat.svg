@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="dropSvg" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 404 606">
+ <defs>
+      <linearGradient
+        gradientTransform="rotate( 0, 0.5, 0.5 )"
+        id="gradient"
+        gradientUnits="objectBoundingBox"
+      >
+        <stop offset="0.4" style="stop-color: #33ff8f" />
+        <stop offset="0.6" style="stop-color: #5a33ff" />
+      </linearGradient>
+    </defs>
+  <path fill="url(#gradient)" class="cls-1" d="M387.9,330.4c23.1,50.8,20.3,102.6-1.5,153.1-28.2,65.3-78.2,105.4-147.9,118.6-61.7,11.7-118.2-2.7-166.4-43.6C21,515.1-1.8,458.7.1,392.1c.8-25.9,8.5-50.3,20.1-73.3C51.4,256.6,148.5,65.4,172.6,18.5c12.2-23.8,45.9-23.7,58,.1,0,0,139.4,272.4,157.2,311.9Z"/>
+</svg>
