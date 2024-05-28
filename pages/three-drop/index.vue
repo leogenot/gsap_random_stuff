@@ -9,7 +9,11 @@
       :class="{ 'is-loaded': isLoaded }"
     ></div>
     <div class="section section-2">
-      <NuxtIcon class="grainy-drop" name="grainyDrop" />
+      <NuxtImg class="grainy-drop" src="images/waterDropDark.png" />
+      <NuxtIcon ref="logo" class="logo" name="logo" />
+    </div>
+    <div class="section section-3">
+      <NuxtImg class="grainy-drop" src="images/waterDropClear.png" />
       <NuxtIcon ref="logo" class="logo" name="logo" />
     </div>
   </div>
@@ -309,7 +313,11 @@ onUnmounted(() => {
     position: relative;
     background-color: #1f1e1c;
     &-2 {
-      background-color: #f0f0f0;
+      background-color: #e4d7d0;
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+    }
+    &-3 {
+      background-color: #213438;
       clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
     }
   }
@@ -338,10 +346,12 @@ onUnmounted(() => {
     height: 50vh;
     width: 50vw;
     pointer-events: none;
-    svg {
+    object-fit: contain;
+    /* img {
       width: 100%;
       height: 100%;
-    }
+      object-fit: contain;
+    } */
   }
 
   .container {
