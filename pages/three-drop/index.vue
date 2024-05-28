@@ -19,7 +19,6 @@
 import { ref, onMounted } from 'vue'
 import { gsap } from 'gsap'
 import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
@@ -28,7 +27,6 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { Vector2 } from 'three'
 import Stats from 'three/addons/libs/stats.module.js'
 
-const meshRef = ref(null)
 const material = ref(null)
 const container = ref(null)
 const firstSection = ref(null)
@@ -36,11 +34,9 @@ const scrollY = ref(0)
 const mouseX = ref(0)
 const mouseY = ref(0)
 const isLoaded = ref(false)
-let scene, camera, renderer, controls, mesh, stats, clock, speed, delta
-let time = 0
+let scene, camera, renderer, mesh, stats
 const options = ref({
   color: 0xdbdfff,
-  // color: 0x5d7f80,
   metalness: 0.1,
   roughness: 0.2,
   transmission: 1,
@@ -54,7 +50,7 @@ const options = ref({
   clearcoatNormalScale: 0,
   normalRepeat: 1,
   bloomThreshold: 0.93,
-  bloomStrength: 0.46,
+  bloomStrength: 0.76,
   bloomRadius: 1,
   enableSwoopingCamera: true,
 })
@@ -264,10 +260,6 @@ onMounted(() => {
     )
   })
 
-  const light = new THREE.DirectionalLight(0x5d7f80, 0)
-  light.position.set(0, 13, 10)
-  // scene.add(light)
-
   stats = new Stats()
   document.body.appendChild(stats.dom)
 
@@ -283,21 +275,6 @@ const animate = () => {
   isLoaded.value = true
   renderer.render(scene, camera)
   stats.update()
-  // time += 0.01
-
-  // update(time)
-}
-
-// Update
-// ------
-
-const update = time => {
-  if (options.value.enableSwoopingCamera) {
-    camera.position.x = Math.sin((time / 10) * Math.PI * 2) * 2
-    camera.position.y = Math.cos((time / 10) * Math.PI * 2) * 2
-    camera.position.z = 2
-    camera.lookAt(scene.position)
-  }
 }
 
 function onScroll() {
