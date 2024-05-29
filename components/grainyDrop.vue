@@ -9,12 +9,11 @@
       <filter id="noise">
         <feTurbulence
           type="fractalNoise"
-          baseFrequency="1.5"
+          baseFrequency="1"
           seed="1"
           numOctaves="1"
           result="turbulence"
         ></feTurbulence>
-
         <feComposite
           operator="in"
           in="turbulence"
@@ -23,6 +22,24 @@
         />
         <feColorMatrix in="composite" type="luminanceToAlpha" />
         <feBlend in="SourceGraphic" in2="composite" mode="color-burn" />
+      </filter>
+      <filter id="blur">
+        <feTurbulence
+          type="fractalNoise"
+          baseFrequency=".75"
+          seed="1"
+          numOctaves="1"
+          result="turbulence"
+        ></feTurbulence>
+        <feComposite
+          operator="in"
+          in="turbulence"
+          in2="SourceAlpha"
+          result="composite"
+        />
+        <feColorMatrix in="composite" type="luminanceToAlpha" />
+        <feBlend in="SourceGraphic" in2="composite" mode="color-burn" />
+        <!-- <feGaussianBlur stdDeviation="10" /> -->
       </filter>
     </defs>
     <clipPath id="clip">
@@ -39,6 +56,9 @@
     >
       <div class="drop-inner" />
     </foreignObject>
+    <foreignObject width="100%" height="100%" filter="url(#blur)">
+      <div class="drop-inner-circle" />
+    </foreignObject>
   </svg>
 </template>
 
@@ -48,6 +68,7 @@ import { gsap } from 'gsap'
 
 onMounted(() => {
   let gradient = document.querySelector('.drop-inner')
+  let gradientCircle = document.querySelector('.drop-inner-circle')
   let centerX
 
   // Get the center of the SVG
@@ -66,14 +87,34 @@ onMounted(() => {
   }
 
   // Smoothly animate the gradient's rotation using GSAP
+  // Smoothly animate the gradient's rotation and noise filter using GSAP
   window.addEventListener('mousemove', event => {
     getCenter()
     const angle = calculateRotationAngle(event)
+    const noiseAmount = Math.random() * (100 - 1000 + 100) + 1000
     gsap.to(gradient, {
       rotation: `${-angle}deg`,
       duration: 2,
       ease: 'power2',
     })
+    gsap.to(
+      gradientCircle,
+      {
+        rotation: `${Math.max(-45, Math.min(45, angle))}deg`,
+        duration: 2,
+        ease: 'power2',
+      },
+      '<'
+    )
+    gsap.to(
+      ['#noise feTurbulence', '#blur feTurbulence'],
+      {
+        attr: { seed: noiseAmount },
+        duration: 2,
+        ease: 'power2',
+      },
+      '<'
+    )
   })
 
   // Initialize center coordinates
@@ -92,8 +133,34 @@ onMounted(() => {
     top: -210%;
     left: 50%;
     transform: translateX(-50%);
-    background: conic-gradient(#223539, #5d939e, #223539, #213438);
+    /* background: conic-gradient(
+      from 180deg at 50% -3.1%,
+      #213438 37.971515357494354deg,
+      #213438 100.971515357494354deg,
+      #e4d7d0 359.7571635246277deg
+    ); */
+
+    background: conic-gradient(#223539, #223539, #e4d7d0, #223539, #213438);
     transform-origin: 50% 50%;
+  }
+  .drop-inner-circle {
+    width: 80%;
+    aspect-ratio: 1;
+    border-radius: 100%;
+    position: absolute;
+    bottom: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: red;
+    background: radial-gradient(
+      105.63% 103.68% at 50% -3.68%,
+      #e4d7d0 32.04%,
+      #213438 100%
+    );
+
+    background-repeat: no-repeat, no-repeat;
+    filter: blur(20px);
+    transform-origin: 50% 50%; /* Ensure the rotation is centered */
   }
 }
 </style>

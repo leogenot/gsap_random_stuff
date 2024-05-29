@@ -22,7 +22,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { gsap } from 'gsap'
+import { gsap, ScrollTrigger } from 'gsap/all'
 import * as THREE from 'three'
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
@@ -31,6 +31,7 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { Vector2 } from 'three'
 import Stats from 'three/addons/libs/stats.module.js'
+gsap.registerPlugin(ScrollTrigger)
 
 const material = ref(null)
 const container = ref(null)
@@ -226,23 +227,41 @@ onMounted(() => {
     shaderControls.shapeGroupScale.y = 1.2
     shaderControls.shapeGroupScale.z = 1.2
 
-    console.log('shader', shaderOptions)
-
     gltf.scene.children.forEach(child => {
       child.geometry.dispose()
       child.material.dispose()
     })
     fitCameraToCenteredObject(camera, mesh)
-    gsap.to(mesh.rotation, {
-      y: 3,
 
-      scrollTrigger: {
-        trigger: firstSection.value,
-        scrub: 1,
-        start: 'top 0',
-        end: 'bottom top',
-      },
-    })
+    const orbitRadius = 99
+    const orbitSpeed = 0.001
+
+    function updateCameraPosition() {
+      // Calculate new camera position based on scroll
+      const orbitAngle = scrollY.value * orbitSpeed
+      const cameraX = Math.sin(orbitAngle) * orbitRadius
+      const cameraZ = Math.cos(orbitAngle) * orbitRadius
+
+      // Update camera position
+      camera.position.x = cameraX
+      camera.position.z = cameraZ
+
+      // Set camera to always look at the mesh
+      camera.lookAt(mesh.position)
+    }
+    gsap.to(
+      {},
+      {
+        scrollTrigger: {
+          trigger: firstSection.value,
+          onUpdate: updateCameraPosition,
+          start: 'top 0',
+          end: 'bottom top',
+          scrub: 1,
+        },
+      }
+    )
+
     gsap.to(
       shaderOptions.perlin,
       {
