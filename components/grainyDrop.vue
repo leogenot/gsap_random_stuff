@@ -89,11 +89,11 @@ onMounted(() => {
     width: 400%;
     height: 400%;
     position: absolute;
-    top: -5%;
+    top: -210%;
     left: 50%;
-    transform: translate(-50%, 0%);
+    transform: translateX(-50%);
     background: conic-gradient(#223539, #5d939e, #223539, #213438);
-    /* transform-origin: top center; */
+    transform-origin: 50% 50%;
   }
 }
 </style>
