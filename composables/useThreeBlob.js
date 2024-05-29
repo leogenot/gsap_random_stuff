@@ -125,7 +125,7 @@ var options = {
         gcolor: 0.05,
         bcolor: 0.6,
         fragment: true,
-        points: true,
+        points: false,
         redhell: false
     },
     perlinRandom: function () {

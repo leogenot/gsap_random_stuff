@@ -31,6 +31,25 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { Vector2 } from 'three'
 import Stats from 'three/addons/libs/stats.module.js'
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
+import { BloomPass } from 'three/addons/postprocessing/BloomPass.js'
+import { FilmPass } from 'three/addons/postprocessing/FilmPass.js'
+import { DotScreenPass } from 'three/addons/postprocessing/DotScreenPass.js'
+import {
+  MaskPass,
+  ClearMaskPass,
+} from 'three/addons/postprocessing/MaskPass.js'
+import { TexturePass } from 'three/addons/postprocessing/TexturePass.js'
+
+import { BleachBypassShader } from 'three/addons/shaders/BleachBypassShader.js'
+import { ColorifyShader } from 'three/addons/shaders/ColorifyShader.js'
+import { HorizontalBlurShader } from 'three/addons/shaders/HorizontalBlurShader.js'
+import { VerticalBlurShader } from 'three/addons/shaders/VerticalBlurShader.js'
+import { SepiaShader } from 'three/addons/shaders/SepiaShader.js'
+import { HueSaturationShader } from 'three/addons/shaders/HueSaturationShader.js'
+import { VignetteShader } from 'three/addons/shaders/VignetteShader.js'
+import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js'
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 gsap.registerPlugin(ScrollTrigger)
 
 const material = ref(null)
@@ -40,7 +59,7 @@ const scrollY = ref(0)
 const mouseX = ref(0)
 const mouseY = ref(0)
 const isLoaded = ref(false)
-let scene, camera, renderer, mesh, stats
+let scene, camera, renderer, mesh, stats, composer
 const options = ref({
   color: 0xdbdfff,
   metalness: 0.1,
@@ -49,16 +68,15 @@ const options = ref({
   ior: 1.3,
   reflectivity: 0.4,
   thickness: 1.5,
-  envMapIntensity: 1.1,
+  envMapIntensity: 0.02,
   clearcoat: 0.25,
   clearcoatRoughness: 0.1,
   normalScale: 1,
   clearcoatNormalScale: 0,
   normalRepeat: 1,
-  bloomThreshold: 0.93,
-  bloomStrength: 0.76,
-  bloomRadius: 1,
-  enableSwoopingCamera: true,
+  bloomThreshold: 0.03,
+  bloomStrength: 0.02,
+  bloomRadius: 0.01,
 })
 
 const {
@@ -143,7 +161,53 @@ const fitCameraToCenteredObject = function (
 }
 
 onMounted(() => {
-  scene = new THREE.Scene()
+  const shaderBleach = BleachBypassShader
+  const shaderSepia = SepiaShader
+  const shaderVignette = VignetteShader
+  const shaderHueSaturation = HueSaturationShader
+
+  const effectBleach = new ShaderPass(shaderBleach)
+  const effectSepia = new ShaderPass(shaderSepia)
+  const effectVignette = new ShaderPass(shaderVignette)
+  const gammaCorrection = new ShaderPass(GammaCorrectionShader)
+  const effectHueSaturation = new ShaderPass(shaderHueSaturation)
+
+  effectHueSaturation.uniforms['hue'].value = 5
+  effectHueSaturation.uniforms['saturation'].value = 0.7
+
+  effectBleach.uniforms['opacity'].value = 0.95
+
+  effectSepia.uniforms['amount'].value = 0.9
+
+  effectVignette.uniforms['offset'].value = 0.95
+  effectVignette.uniforms['darkness'].value = 1.6
+
+  const effectBloom = new BloomPass(1.5)
+  const effectFilm = new FilmPass(0.35)
+  const effectFilmBW = new FilmPass(0.35, true)
+  const effectDotScreen = new DotScreenPass(new THREE.Vector2(0, 0), 0.5, 0.8)
+
+  const effectHBlur = new ShaderPass(HorizontalBlurShader)
+  const effectVBlur = new ShaderPass(VerticalBlurShader)
+  effectHBlur.uniforms['h'].value = 0.15 / (container.value.clientWidth / 2)
+  effectVBlur.uniforms['v'].value = 0.15 / (container.value.clientHeight / 2)
+
+  const effectColorify1 = new ShaderPass(ColorifyShader)
+  const effectColorify2 = new ShaderPass(ColorifyShader)
+  effectColorify1.uniforms['color'] = new THREE.Uniform(
+    new THREE.Color('skyblue')
+  )
+  effectColorify2.uniforms['color'] = new THREE.Uniform(
+    new THREE.Color(1, 0.75, 0.5)
+  )
+
+  const clearMask = new ClearMaskPass()
+
+  const rtParameters = {
+    stencilBuffer: true,
+  }
+
+  scene = new THREE.Scene({ alpha: true })
   camera = new THREE.PerspectiveCamera(
     1,
     window.innerWidth / window.innerHeight,
@@ -153,23 +217,14 @@ onMounted(() => {
   camera.position.z = 2
   camera.position.y = 1
 
-  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false })
-  renderer.setClearColor(0x1f1e1c, 1)
-  renderer.shadowMap.enabled = true
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+  // renderer.setClearColor(0x1f1e1c, 1)
+  // renderer.setClearColor(0x000000, 0)
+  // renderer.shadowMap.enabled = true
   renderer.setSize(container.value.clientWidth, container.value.clientHeight)
   container.value.appendChild(renderer.domElement)
 
-  const renderPass = new RenderPass(scene, camera)
-  const bloomPass = new UnrealBloomPass(
-    new Vector2(container.value.clientWidth, container.value.clientHeight),
-    options.bloomStrength,
-    options.bloomRadius,
-    options.bloomThreshold
-  )
-
-  const composer = new EffectComposer(renderer)
-  composer.addPass(renderPass)
-  composer.addPass(bloomPass)
+  composer = new EffectComposer(renderer)
 
   const hdrEquirect = new RGBELoader().load(
     '/images/empty_warehouse_01_2k.hdr',
@@ -201,6 +256,22 @@ onMounted(() => {
     clearcoatNormalScale: new Vector2(options.value.clearcoatNormalScale),
   })
 
+  const renderPass = new RenderPass(scene, camera)
+
+  composer.renderTarget1.format = THREE.RGBAFormat
+  composer.renderTarget2.format = THREE.RGBAFormat
+
+  composer.addPass(renderPass)
+
+  // composer.addPass(effectBleach)
+  // composer.addPass(effectVignette)
+  // composer.addPass(effectColorify1)
+  // composer.addPass(effectColorify2)
+  // composer.addPass(effectHueSaturation)
+  composer.addPass(effectFilm)
+  composer.addPass(effectHBlur)
+  composer.addPass(effectVBlur)
+
   new GLTFLoader().load('/models/water-drop.glb', gltf => {
     const drop = gltf.scene.children[0]
     const geometry = drop.geometry.clone()
@@ -219,7 +290,7 @@ onMounted(() => {
     )
 
     const box = new THREE.BoxHelper(mesh, 0xffff00)
-    scene.add(box)
+    // scene.add(box)
 
     init(mesh)
     shaderControls.shapeGroupPosition.y = -1
@@ -298,6 +369,7 @@ const animate = () => {
   requestAnimationFrame(animate)
   isLoaded.value = true
   renderer.render(scene, camera)
+  composer.render()
   stats.update()
 }
 
