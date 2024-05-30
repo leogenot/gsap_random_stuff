@@ -46,10 +46,12 @@ import { ColorifyShader } from 'three/addons/shaders/ColorifyShader.js'
 import { HorizontalBlurShader } from 'three/addons/shaders/HorizontalBlurShader.js'
 import { VerticalBlurShader } from 'three/addons/shaders/VerticalBlurShader.js'
 import { SepiaShader } from 'three/addons/shaders/SepiaShader.js'
+import { ExposureShader } from 'three/addons/shaders/ExposureShader.js'
 import { HueSaturationShader } from 'three/addons/shaders/HueSaturationShader.js'
 import { VignetteShader } from 'three/addons/shaders/VignetteShader.js'
 import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
+import { PencilLinesPass } from '/utils/PencilLinesPass'
 gsap.registerPlugin(ScrollTrigger)
 
 const material = ref(null)
@@ -59,7 +61,7 @@ const scrollY = ref(0)
 const mouseX = ref(0)
 const mouseY = ref(0)
 const isLoaded = ref(false)
-let scene, camera, renderer, mesh, stats, composer
+let scene, camera, renderer, mesh, stats, composer, pencilLinePass
 const options = ref({
   color: 0xdbdfff,
   metalness: 0.1,
@@ -165,15 +167,18 @@ onMounted(() => {
   const shaderSepia = SepiaShader
   const shaderVignette = VignetteShader
   const shaderHueSaturation = HueSaturationShader
+  const shaderExposure = ExposureShader
 
   const effectBleach = new ShaderPass(shaderBleach)
   const effectSepia = new ShaderPass(shaderSepia)
   const effectVignette = new ShaderPass(shaderVignette)
   const gammaCorrection = new ShaderPass(GammaCorrectionShader)
   const effectHueSaturation = new ShaderPass(shaderHueSaturation)
+  effectHueSaturation.uniforms['hue'].value = 0.7
+  effectHueSaturation.uniforms['saturation'].value = 0
+  const effectExposure = new ShaderPass(shaderExposure)
 
-  effectHueSaturation.uniforms['hue'].value = 5
-  effectHueSaturation.uniforms['saturation'].value = 0.7
+  effectExposure.uniforms['exposure'].value = 2
 
   effectBleach.uniforms['opacity'].value = 0.95
 
@@ -185,7 +190,7 @@ onMounted(() => {
   const effectBloom = new BloomPass(1.5)
   const effectFilm = new FilmPass(0.35)
   const effectFilmBW = new FilmPass(0.35, true)
-  const effectDotScreen = new DotScreenPass(new THREE.Vector2(0, 0), 0.5, 0.8)
+  const effectDotScreen = new DotScreenPass(new THREE.Vector2(0, 0), 0.5, 5)
 
   const effectHBlur = new ShaderPass(HorizontalBlurShader)
   const effectVBlur = new ShaderPass(VerticalBlurShader)
@@ -221,6 +226,7 @@ onMounted(() => {
   // renderer.setClearColor(0x1f1e1c, 1)
   // renderer.setClearColor(0x000000, 0)
   // renderer.shadowMap.enabled = true
+  renderer.setClearColor(0x000000, 0)
   renderer.setSize(container.value.clientWidth, container.value.clientHeight)
   container.value.appendChild(renderer.domElement)
 
@@ -269,6 +275,8 @@ onMounted(() => {
   // composer.addPass(effectColorify2)
   // composer.addPass(effectHueSaturation)
   composer.addPass(effectFilm)
+  composer.addPass(effectExposure)
+  // composer.addPass(effectDotScreen)
   composer.addPass(effectHBlur)
   composer.addPass(effectVBlur)
 

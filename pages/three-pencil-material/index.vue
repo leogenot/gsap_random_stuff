@@ -54,6 +54,24 @@ const stats = ref(null)
 const firstSection = ref(null)
 const mouseX = ref(0)
 const mouseY = ref(0)
+const options = ref({
+  color: 0x48c3ff,
+  metalness: 0.1,
+  roughness: 0.2,
+  transmission: 1,
+  ior: 1.3,
+  reflectivity: 0.4,
+  thickness: 1.5,
+  envMapIntensity: 0.02,
+  clearcoat: 0.25,
+  clearcoatRoughness: 0.1,
+  normalScale: 1,
+  clearcoatNormalScale: 0,
+  normalRepeat: 1,
+  bloomThreshold: 0.03,
+  bloomStrength: 0.02,
+  bloomRadius: 0.01,
+})
 onMounted(() => {
   init()
   animate()
@@ -68,7 +86,9 @@ onUnmounted(() => {
 
 function init() {
   // Scene setup
-  scene = new THREE.Scene()
+  scene = new THREE.Scene({
+    alpha: true,
+  })
 
   // Camera setup
   camera = new THREE.PerspectiveCamera(
@@ -81,33 +101,43 @@ function init() {
 
   // Renderer setup
   const geometry = new THREE.TorusKnotGeometry(1, 0.3, 200, 32)
-  const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 })
+  const material = new THREE.MeshPhysicalMaterial({})
+  material.reflectivity = 0
+  material.transmission = 1.0
+  material.roughness = 0.2
+  material.metalness = 0
+  material.clearcoat = 0.3
+  material.clearcoatRoughness = 0.25
+  // material.color = new THREE.Color(0xffffff)
+  material.ior = 1.2
+  material.thickness = 10.0
+  // torus = new THREE.Mesh(geometry, material)
   torus = new THREE.Mesh(geometry, material)
   // torus.castShadow = true
   torus.position.set(0, 0, 0)
-  // scene.add(torus)
+  scene.add(torus)
 
-  const loader = new OBJLoader()
+  // const loader = new OBJLoader()
 
   // load a resource
-  loader.load(
-    // resource URL
-    '/models/water-drop.obj',
-    // called when resource is loaded
-    function (object) {
-      object.scale.set(0.003, 0.003, 0.003)
-      object.position.set(0, -1, 0)
-      scene.add(object)
-    },
-    // called when loading is in progresses
-    function (xhr) {
-      console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
-    },
-    // called when loading has errors
-    function (error) {
-      console.log('An error happened')
-    }
-  )
+  // loader.load(
+  //   // resource URL
+  //   '/models/water-drop.obj',
+  //   // called when resource is loaded
+  //   function (object) {
+  //     object.scale.set(0.003, 0.003, 0.003)
+  //     object.position.set(0, -1, 0)
+  //     scene.add(object)
+  //   },
+  //   // called when loading is in progresses
+  //   function (xhr) {
+  //     console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+  //   },
+  //   // called when loading has errors
+  //   function (error) {
+  //     console.log('An error happened')
+  //   }
+  // )
 
   camera.position.z = 1
   camera.position.y = 0.2
@@ -117,24 +147,43 @@ function init() {
   directionalLight.position.set(2, 2, 2)
   directionalLight.shadow.mapSize.width = 2048
   directionalLight.shadow.mapSize.height = 2048
-  scene.add(directionalLight)
+  // scene.add(directionalLight)
 
   const hemisphereLight = new THREE.HemisphereLight(0x7a3114, 0x48c3ff, 0.5)
-  scene.add(hemisphereLight)
+  // scene.add(hemisphereLight)
 
-  renderer = new THREE.WebGLRenderer()
+  renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    alpha: true,
+  })
   renderer.setSize(container.value.clientWidth, container.value.clientHeight)
-  renderer.setClearColor('#eee')
-  renderer.physicallyCorrectLights = true
-  renderer.outputEncoding = THREE.sRGBEncoding
+  // renderer.setClearColor('#eee')
+  // renderer.physicallyCorrectLights = true
+  renderer.outputEncoding = THREE.RGBAFormat
   renderer.toneMapping = THREE.CineonToneMapping
   renderer.toneMappingExposure = 1.75
-  renderer.shadowMap.enabled = true
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap
+  // renderer.shadowMap.enabled = true
+  // renderer.shadowMap.type = THREE.PCFSoftShadowMap
   document.body.appendChild(renderer.domElement)
 
-  composer = new EffectComposer(renderer)
+  var parameters = {
+    minFilter: THREE.LinearFilter,
+    magFilter: THREE.LinearFilter,
+    format: THREE.RGBAFormat,
+    stencilBuffer: true,
+  }
+
+  var renderTarget = new THREE.WebGLRenderTarget(
+    renderer.domElement.width,
+    renderer.domElement.height,
+    parameters
+  )
+
+  composer = new EffectComposer(renderer, renderTarget)
+  composer.renderTarget1.format = THREE.RGBAFormat
+  composer.renderTarget2.format = THREE.RGBAFormat
   renderPass = new RenderPass(scene, camera)
+  renderPass.clear = true
   pencilLinePass = new PencilLinesPass({
     width: renderer.domElement.clientWidth,
     height: renderer.domElement.clientHeight,
@@ -143,7 +192,7 @@ function init() {
   })
 
   composer.addPass(renderPass)
-  composer.addPass(pencilLinePass)
+  // composer.addPass(pencilLinePass)
 
   controls = new OrbitControls(camera, renderer.domElement)
 
@@ -206,6 +255,7 @@ function animate() {
 
 function render() {
   controls.update()
+  renderer.render(scene, camera)
   composer.render()
   isLoaded.value = true
 }
@@ -230,6 +280,7 @@ function dispose() {
 
 <style lang="postcss">
 .scrollytelling {
+  background-color: grey;
   .section {
     height: 400vh;
     position: relative;

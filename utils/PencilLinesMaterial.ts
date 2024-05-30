@@ -114,14 +114,17 @@ void main() {
     float sobelValue = combinedSobelValue();
     sobelValue = smoothstep(0.01, 0.03, sobelValue);
 
-    vec4 lineColor = vec4(float(0x21) / 255.0,float(0x34) / 255.0,float(0x38) / 255.0,1.0);
+    vec4 lineColor = vec4(float(0x21) / 255.0, float(0x34) / 255.0, float(0x38) / 255.0, 1.0);
 
     if (sobelValue > 0.1) {
         gl_FragColor = lineColor;
     } else {
-        gl_FragColor = vec4(1.0);
+        // Preserve the alpha of the original scene
+        vec4 originalColor = texture2D(tDiffuse, vUv);
+        gl_FragColor = vec4(originalColor.rgb, originalColor.a);
     }
 }
+
 `
 
 const vertexShader = `varying vec2 vUv;

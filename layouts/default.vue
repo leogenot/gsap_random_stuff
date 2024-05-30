@@ -61,6 +61,10 @@ const options = [
     value: 'three-drop',
   },
   {
+    name: 'three-transition',
+    value: 'three-transition',
+  },
+  {
     name: 'scrolltrigger-card-stack',
     value: 'scrolltrigger-card-stack',
   },
